@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Planejamento Semanal — Primetec Confeitaria</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --verde:#6BBF2E;--verde-d:#58A020;--verde-pale:#F0FAE6;
+  --azul:#1E5EAD;--azul-d:#174E92;--azul-pale:#E8F0FA;
+  --bg:#F2F4F7;--white:#fff;--border:#E0E4EC;
+  --text:#1A1E2E;--muted:#6B7280;
+  --chat-user:#1E5EAD;--chat-ai:#F7F9FC;
+  --radius:12px;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+
+/* TOP BAR */
+.topbar{height:4px;background:linear-gradient(90deg,var(--verde),var(--azul))}
+.header{background:var(--white);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.header-left{display:flex;align-items:center;gap:12px}
+.badge{background:var(--verde-pale);color:var(--verde-d);font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:0.06em;text-transform:uppercase}
+.week-label{font-size:12px;color:var(--muted);font-weight:500}
+
+/* LAYOUT */
+.app{display:grid;grid-template-columns:1fr 340px;flex:1;height:calc(100vh - 57px);overflow:hidden}
+
+/* CHAT PANEL */
+.chat-panel{display:flex;flex-direction:column;height:100%;overflow:hidden;border-right:1px solid var(--border)}
+.chat-header{padding:14px 18px;background:var(--white);border-bottom:1px solid var(--border);font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+.chat-header .dot{width:8px;height:8px;background:var(--verde);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+.messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--bg)}
+.messages::-webkit-scrollbar{width:4px}
+.messages::-webkit-scrollbar-track{background:transparent}
+.messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+.msg{display:flex;gap:10px;animation:fadeUp 0.25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.msg.user{flex-direction:row-reverse}
+.msg-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;font-family:'Montserrat',sans-serif}
+.msg.ai .msg-avatar{background:var(--azul-pale);color:var(--azul)}
+.msg.user .msg-avatar{background:var(--azul);color:#fff}
+.msg-bubble{max-width:80%;padding:10px 14px;border-radius:14px;font-size:13.5px;line-height:1.65}
+.msg.ai .msg-bubble{background:var(--white);border:1px solid var(--border);border-bottom-left-radius:4px;color:var(--text)}
+.msg.user .msg-bubble{background:var(--azul);color:#fff;border-bottom-right-radius:4px}
+.msg-bubble ul{padding-left:16px;margin-top:6px}
+.msg-bubble li{margin-bottom:3px}
+.msg-bubble strong{font-weight:600}
+.msg-bubble .day-tag{display:inline-block;background:var(--verde-pale);color:var(--verde-d);font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em}
+.msg-bubble table{width:100%;border-collapse:collapse;margin-top:8px;font-size:12.5px}
+.msg-bubble th{background:var(--azul-pale);color:var(--azul);padding:5px 8px;text-align:left;font-weight:600}
+.msg-bubble td{padding:5px 8px;border-bottom:1px solid var(--border)}
+.msg-bubble tr:last-child td{border-bottom:none}
+
+.typing{display:flex;align-items:center;gap:5px;padding:10px 14px;background:var(--white);border:1px solid var(--border);border-radius:14px;border-bottom-left-radius:4px;width:fit-content}
+.typing span{width:6px;height:6px;background:var(--muted);border-radius:50%;animation:bounce 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+
+.input-area{padding:12px 14px;background:var(--white);border-top:1px solid var(--border)}
+.input-row{display:flex;gap:8px;align-items:flex-end}
+.input-row textarea{flex:1;font-family:'Inter',sans-serif;font-size:13.5px;color:var(--text);background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px 13px;outline:none;resize:none;max-height:120px;min-height:42px;line-height:1.5;transition:border-color .2s}
+.input-row textarea:focus{border-color:var(--azul);background:var(--white)}
+.input-row textarea::placeholder{color:#B0B7C3}
+.btn-send{width:42px;height:42px;background:var(--verde);border:none;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s,transform .1s}
+.btn-send:hover{background:var(--verde-d)}
+.btn-send:active{transform:scale(0.95)}
+.btn-send svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.hint{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5}
+
+/* SIDEBAR — PLANEJAMENTO */
+.sidebar{display:flex;flex-direction:column;height:100%;overflow:hidden;background:var(--white)}
+.sidebar-header{padding:14px 18px;border-bottom:1px solid var(--border);font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;justify-content:space-between}
+.sidebar-tabs{display:flex;border-bottom:1px solid var(--border)}
+.tab{flex:1;padding:10px;font-size:12px;font-weight:600;text-align:center;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all .15s;background:none;border-top:none;border-left:none;border-right:none;font-family:'Inter',sans-serif}
+.tab.active{color:var(--azul);border-bottom-color:var(--azul)}
+.tab:hover:not(.active){color:var(--text)}
+.sidebar-body{flex:1;overflow-y:auto;padding:14px}
+.sidebar-body::-webkit-scrollbar{width:4px}
+.sidebar-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+/* SEMANA */
+.week-grid{display:flex;flex-direction:column;gap:10px}
+.day-card{border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.day-card-header{padding:8px 12px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between}
+.day-card-header.verde{background:var(--verde-pale);color:var(--verde-d)}
+.day-card-header.azul{background:var(--azul-pale);color:var(--azul)}
+.day-card-body{padding:10px 12px;font-size:12.5px;color:var(--muted)}
+.recipe-item{padding:5px 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:6px}
+.recipe-item:last-child{border-bottom:none}
+.recipe-item .dot2{width:6px;height:6px;background:var(--verde);border-radius:50%;flex-shrink:0;margin-top:5px}
+.recipe-item .rname{font-size:13px;color:var(--text);font-weight:500}
+.recipe-item .rmeta{font-size:11px;color:var(--muted)}
+.empty-day{font-size:12px;color:#C0C7D4;font-style:italic;padding:4px 0}
+
+/* LISTA DE COMPRAS */
+.shopping-section{margin-bottom:16px}
+.shopping-section-title{font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--border)}
+.shop-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #F0F2F5}
+.shop-item:last-child{border-bottom:none}
+.shop-check{width:16px;height:16px;border:1.5px solid var(--border);border-radius:4px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.shop-check.checked{background:var(--verde);border-color:var(--verde)}
+.shop-check.checked::after{content:'✓';font-size:10px;color:#fff;font-weight:700}
+.shop-item-name{flex:1;font-size:13px;color:var(--text)}
+.shop-item-qty{font-size:12px;color:var(--muted);font-weight:500;white-space:nowrap}
+.shop-item.checked-item .shop-item-name{text-decoration:line-through;color:var(--muted)}
+
+.empty-state{text-align:center;padding:32px 16px;color:var(--muted)}
+.empty-state .icon{font-size:32px;margin-bottom:10px;display:block}
+.empty-state p{font-size:13px;line-height:1.6}
+
+.btn-clear{background:none;border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-size:12px;color:var(--muted);cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s}
+.btn-clear:hover{border-color:#E08080;color:#C0392B;background:#FEE8E8}
+
+@media(max-width:680px){
+  .app{grid-template-columns:1fr;grid-template-rows:1fr auto}
+  .sidebar{max-height:40vh}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar"></div>
+<div class="header">
+  <div class="header-left">
+    <div class="badge">🎂 Confeitaria — Planejamento Semanal</div>
+  </div>
+  <div class="week-label" id="weekLabel"></div>
+</div>
+
+<div class="app">
+
+  <!-- CHAT -->
+  <div class="chat-panel">
+    <div class="chat-header">
+      <div class="dot"></div>
+      Assistente de Planejamento
+    </div>
+
+    <div class="messages" id="messages"></div>
+
+    <div class="input-area">
+      <div class="input-row">
+        <textarea id="userInput" placeholder="Ex: Segunda — Bolo Red Velvet (30 alunos). Terça — Trufa de chocolate (20 alunos)..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="btn-send" onclick="sendMessage()">
+          <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+      <div class="hint">Dica: informe o dia, receita e número de alunos. Para lista de compras por dia, diga quais dias você vai às compras.</div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      Planejamento da semana
+      <button class="btn-clear" onclick="clearAll()">Limpar</button>
+    </div>
+    <div class="sidebar-tabs">
+      <button class="tab active" onclick="showTab('semana')">📅 Semana</button>
+      <button class="tab" onclick="showTab('compras')">🛒 Compras</button>
+    </div>
+    <div class="sidebar-body">
+      <div id="tabSemana">
+        <div class="empty-state">
+          <span class="icon">📅</span>
+          <p>Envie as receitas da semana no chat e elas aparecerão aqui organizadas por dia.</p>
+        </div>
+      </div>
+      <div id="tabCompras" style="display:none">
+        <div class="empty-state">
+          <span class="icon">🛒</span>
+          <p>Após organizar as receitas, peça a lista de compras e ela aparecerá aqui.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const CLAUDE_API = 'https://api.anthropic.com/v1/messages';
+
+let weekData = {};
+let shoppingData = [];
+let conversationHistory = [];
+
+const DIAS_ORDEM = ['segunda','terça','quarta','quinta','sexta','sábado','domingo'];
+const DIAS_LABEL = {'segunda':'Segunda-feira','terça':'Terça-feira','quarta':'Quarta-feira','quinta':'Quinta-feira','sexta':'Sexta-feira','sábado':'Sábado','domingo':'Domingo'};
+
+const SYSTEM_PROMPT = `Você é a assistente de planejamento da Primetec Cursos — escola de confeitaria profissional.
+Sua função é ajudar a coordenadora a organizar as receitas das aulas da semana (segunda a terça da próxima semana) e gerar listas de compras.
+
+REGRAS:
+1. Quando a usuária enviar receitas, extraia: dia da semana, nome da receita, número de alunos, e ingredientes estimados.
+2. Se ela pedir para triplicar ou multiplicar uma receita, ajuste todos os ingredientes proporcionalmente.
+3. Quando ela pedir lista de compras, some todos os ingredientes de todas as receitas da semana, agrupe por categoria (farinhas, laticínios, ovos, chocolates, frutas, etc.) e totalize as quantidades.
+4. Se ela quiser dividir as compras por dias (ex: "vou às compras segunda e quarta"), divida a lista de forma inteligente: ingredientes perecíveis (ovos, laticínios, frutas) perto da data de uso; não perecíveis podem vir antes.
+5. Sempre responda em português brasileiro, de forma clara e objetiva.
+6. Ao extrair dados estruturados, inclua no final da resposta um bloco JSON especial entre |||JSON_START||| e |||JSON_END||| com o seguinte formato:
+{
+  "action": "update_week" | "update_shopping" | "none",
+  "week": { "segunda": [{"receita":"nome","alunos":N,"ingredientes":[{"nome":"x","qtd":"y","unidade":"z","categoria":"cat"}]}], ... },
+  "shopping": [{"nome":"x","qtd":"y","unidade":"z","categoria":"cat","dia_compra":"segunda"}],
+  "shopping_days": ["segunda","quarta"]
+}
+Inclua apenas os dias que tiverem dados. Se não houver dados estruturados, use action: "none".`;
+
+function getWeekRange() {
+  const now = new Date();
+  const day = now.getDay();
+  const monday = new Date(now);
+  monday.setDate(now.getDate() + (day === 0 ? 1 : 8 - day));
+  const tuesday = new Date(monday);
+  tuesday.setDate(monday.getDate() + 8);
+  const fmt = d => d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+  return `${fmt(monday)} a ${fmt(tuesday)}`;
+}
+
+document.getElementById('weekLabel').textContent = getWeekRange();
+
+function addMessage(role, html, raw) {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar';
+  avatar.textContent = role === 'ai' ? 'IA' : 'VC';
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+  bubble.innerHTML = html;
+  div.appendChild(avatar);
+  div.appendChild(bubble);
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTyping() {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg ai';
+  div.id = 'typing-indicator';
+  div.innerHTML = `<div class="msg-avatar">IA</div><div class="typing"><span></span><span></span><span></span></div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function removeTyping() {
+  const el = document.getElementById('typing-indicator');
+  if (el) el.remove();
+}
+
+function parseAndRender(text) {
+  let clean = text;
+  const jsonMatch = text.match(/\|\|\|JSON_START\|\|\|([\s\S]*?)\|\|\|JSON_END\|\|\|/);
+  if (jsonMatch) {
+    clean = text.replace(/\|\|\|JSON_START\|\|\|[\s\S]*?\|\|\|JSON_END\|\|\|/,'').trim();
+    try {
+      const data = JSON.parse(jsonMatch[1].trim());
+      if (data.action === 'update_week' && data.week) {
+        Object.assign(weekData, data.week);
+        renderWeek();
+      }
+      if (data.action === 'update_shopping' && data.shopping) {
+        shoppingData = data.shopping;
+        renderShopping(data.shopping_days);
+      }
+    } catch(e) {}
+  }
+  return formatMessage(clean);
+}
+
+function formatMessage(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/__(.*?)__/g,'<strong>$1</strong>')
+    .replace(/^### (.+)$/gm,'<strong>$1</strong>')
+    .replace(/^## (.+)$/gm,'<strong>$1</strong>')
+    .replace(/^- (.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/gs, s => `<ul>${s}</ul>`)
+    .replace(/\n\n/g,'<br><br>')
+    .replace(/\n/g,'<br>');
+}
+
+async function sendMessage() {
+  const input = document.getElementById('userInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  addMessage('user', text.replace(/\n/g,'<br>'));
+  input.value = '';
+  input.style.height = 'auto';
+
+  conversationHistory.push({ role: 'user', content: text });
+  showTyping();
+
+  try {
+    const res = await fetch(CLAUDE_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT,
+        messages: conversationHistory
+      })
+    });
+
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || 'Desculpe, não consegui processar.';
+    conversationHistory.push({ role: 'assistant', content: reply });
+    removeTyping();
+    addMessage('ai', parseAndRender(reply));
+  } catch(e) {
+    removeTyping();
+    addMessage('ai', 'Erro de conexão. Verifique sua internet e tente novamente.');
+  }
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function showTab(tab) {
+  document.getElementById('tabSemana').style.display = tab === 'semana' ? 'block' : 'none';
+  document.getElementById('tabCompras').style.display = tab === 'compras' ? 'block' : 'none';
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='semana')||(i===1&&tab==='compras')));
+}
+
+function renderWeek() {
+  const container = document.getElementById('tabSemana');
+  if (!Object.keys(weekData).length) return;
+
+  const colors = ['verde','azul','verde','azul','verde','azul','verde'];
+  let html = '<div class="week-grid">';
+
+  DIAS_ORDEM.forEach((dia, i) => {
+    if (!weekData[dia]) return;
+    const receitas = weekData[dia];
+    const cor = colors[i];
+    html += `<div class="day-card">
+      <div class="day-card-header ${cor}">${DIAS_LABEL[dia]||dia}
+        <span style="font-size:10px;font-weight:500">${receitas.length} aula${receitas.length>1?'s':''}</span>
+      </div>
+      <div class="day-card-body">`;
+    receitas.forEach(r => {
+      html += `<div class="recipe-item">
+        <div class="dot2"></div>
+        <div>
+          <div class="rname">${r.receita}</div>
+          <div class="rmeta">${r.alunos ? r.alunos+' alunos' : ''}</div>
+        </div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function renderShopping(shopDays) {
+  const container = document.getElementById('tabCompras');
+  if (!shoppingData.length) return;
+
+  showTab('compras');
+
+  const byCategory = {};
+  const byDay = {};
+
+  shoppingData.forEach(item => {
+    const cat = item.categoria || 'Outros';
+    if (!byCategory[cat]) byCategory[cat] = [];
+    byCategory[cat].push(item);
+    if (item.dia_compra) {
+      if (!byDay[item.dia_compra]) byDay[item.dia_compra] = [];
+      byDay[item.dia_compra].push(item);
+    }
+  });
+
+  const hasDays = Object.keys(byDay).length > 0;
+  let html = '';
+
+  if (hasDays) {
+    DIAS_ORDEM.forEach(dia => {
+      if (!byDay[dia]) return;
+      html += `<div class="shopping-section">
+        <div class="shopping-section-title">🗓 Compras de ${DIAS_LABEL[dia]||dia}</div>`;
+      byDay[dia].forEach((item, idx) => {
+        html += shopItemHTML(item, `d-${dia}-${idx}`);
+      });
+      html += `</div>`;
+    });
+  } else {
+    Object.keys(byCategory).forEach(cat => {
+      html += `<div class="shopping-section">
+        <div class="shopping-section-title">${catIcon(cat)} ${cat}</div>`;
+      byCategory[cat].forEach((item, idx) => {
+        html += shopItemHTML(item, `c-${cat}-${idx}`);
+      });
+      html += `</div>`;
+    });
+  }
+
+  container.innerHTML = html;
+}
+
+function shopItemHTML(item, id) {
+  return `<div class="shop-item" id="si-${id}">
+    <div class="shop-check" onclick="toggleCheck('${id}')" id="chk-${id}"></div>
+    <span class="shop-item-name">${item.nome}</span>
+    <span class="shop-item-qty">${item.qtd} ${item.unidade||''}</span>
+  </div>`;
+}
+
+function toggleCheck(id) {
+  const chk = document.getElementById('chk-'+id);
+  const row = document.getElementById('si-'+id);
+  chk.classList.toggle('checked');
+  row.classList.toggle('checked-item');
+}
+
+function catIcon(cat) {
+  const map = {'farinhas':'🌾','laticínios':'🥛','ovos':'🥚','chocolates':'🍫','frutas':'🍓','açúcar':'🍬','gorduras':'🧈','outros':'📦'};
+  const k = cat.toLowerCase();
+  return map[k] || '📦';
+}
+
+function clearAll() {
+  if (!confirm('Limpar o planejamento da semana?')) return;
+  weekData = {}; shoppingData = []; conversationHistory = [];
+  document.getElementById('tabSemana').innerHTML = `<div class="empty-state"><span class="icon">📅</span><p>Envie as receitas da semana no chat e elas aparecerão aqui organizadas por dia.</p></div>`;
+  document.getElementById('tabCompras').innerHTML = `<div class="empty-state"><span class="icon">🛒</span><p>Após organizar as receitas, peça a lista de compras e ela aparecerá aqui.</p></div>`;
+  document.getElementById('messages').innerHTML = '';
+  showTab('semana');
+  initChat();
+}
+
+function initChat() {
+  addMessage('ai', `Olá! 👋 Sou a assistente de planejamento da <strong>Primetec Confeitaria</strong>.<br><br>
+Me envie as receitas da semana com o dia e número de alunos. Por exemplo:<br>
+<em>"Segunda — Bolo Red Velvet para 25 alunos. Terça — Trufa de chocolate para 20 alunos."</em><br><br>
+Depois é só pedir a <strong>lista de compras</strong> e, se quiser, me dizer em quais dias você vai às compras que eu divido automaticamente! 🛒`);
+}
+
+initChat();
+</script>
+</body>
+</html>
